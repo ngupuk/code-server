@@ -1,0 +1,10 @@
+version: "3"
+
+services:
+  coder:
+    image: codercom/code-server
+    ports:
+      - 8080:8080
+      - 9000:9000
+    volumes:
+      - ./config:/home/coder/.config/code-server
