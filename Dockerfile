@@ -1,12 +1,15 @@
 FROM ubuntu:latest
 
 # Install dependencies
-RUN apt-get update && apt-get install -y curl git && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y curl ca-certificates && rm -rf /var/lib/apt/lists/*
 
-# Download and extract the VS Code CLI for Linux x64
-RUN curl -Lk 'https://code.visualstudio.com/sha/download?build=stable&os=cli-linux-x64' --output vscode_cli.tar.gz \
-    && tar -xf vscode_cli.tar.gz -C /usr/local/bin \
-    && rm vscode_cli.tar.gz
+# Download VS Code CLI
+RUN curl -Lks 'https://code.visualstudio.com/sha/download?build=stable&os=cli-linux-x64' -o vscode_cli.tar.gz
+
+# Extract the binary directly to /usr/local/bin
+RUN tar -xzf vscode_cli.tar.gz -C /usr/local/bin && \
+    chmod +x /usr/local/bin/code && \
+    rm vscode_cli.tar.gz
 
 WORKDIR /workspace
 
