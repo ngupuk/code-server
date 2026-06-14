@@ -41,7 +41,11 @@ RUN tar -xzf vscode_cli.tar.gz -C /usr/local/bin && \
 RUN node --version && npm --version && python --version && git --version
 
 # Create non-root user FIRST, then setup directories
-RUN groupadd --gid $USER_GID $USERNAME && \
+# Remove any existing user/group that conflicts with the desired UID/GID
+# (ubuntu:latest ships with an 'ubuntu' user at UID/GID 1000)
+RUN if getent passwd $USER_UID > /dev/null 2>&1; then userdel $(getent passwd $USER_UID | cut -d: -f1); fi && \
+    if getent group $USER_GID > /dev/null 2>&1; then groupdel $(getent group $USER_GID | cut -d: -f1); fi && \
+    groupadd --gid $USER_GID $USERNAME && \
     useradd --uid $USER_UID --gid $USER_GID -m $USERNAME && \
     echo "$USERNAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
