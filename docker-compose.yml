@@ -26,9 +26,25 @@ services:
         - USER_GID=1000
 
     volumes:
+      # Workspace volume for persistent code
       - ./workspace:/workspace
+      # VS Code CLI data volume - persists tunnel credentials and settings
+      - vscode_data:/home/vscode/.local/share/code-cli
+      # VS Code config volume - persists extensions and settings
+      - vscode_config:/home/vscode/.config/code-server
+      # Home directory volume - persists shell history and other user data
+      - vscode_home:/home/vscode
 
     restart: unless-stopped
+
+# Named volumes for data persistence
+volumes:
+  vscode_data:
+    driver: local
+  vscode_config:
+    driver: local
+  vscode_home:
+    driver: local
 
 # Example: To run as a different user
 # Change the USERNAME, USER_UID, and USER_GID in build args
