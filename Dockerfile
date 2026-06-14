@@ -37,17 +37,20 @@ RUN tar -xzf vscode_cli.tar.gz -C /usr/local/bin && \
     chmod +x /usr/local/bin/code && \
     rm vscode_cli.tar.gz
 
+# Verify installations (run as root before switching user)
+RUN node --version && npm --version && python --version && git --version
+
 # Create non-root user
-RUN groupadd --gid $USER_GID $USERNAME && \
-    useradd --uid $USER_UID --gid $USER_GID -m $USERNAME && \
+RUN groupadd --gid $USER_GID $USERNAME 2>/dev/null || true && \
+    useradd --uid $USER_UID --gid $USER_GID -m $USERNAME 2>/dev/null || true && \
     echo "$USERNAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
 # Setup directories with proper permissions
 RUN mkdir -p /workspace && \
     chown -R $USERNAME:$USERNAME /workspace
 
-# Verify installations
-RUN node --version && npm --version && python --version && git --version
+# Ensure code binary is accessible by non-root user
+RUN chmod +x /usr/local/bin/code
 
 # Switch to non-root user
 USER $USERNAME
@@ -56,9 +59,8 @@ USER $USERNAME
 WORKDIR /workspace
 
 # Environment variables (can be overridden in docker-compose.yml)
-ENV TUNNEL_NAME=${TUNNEL_NAME:-vscode-tunnel}
-ENV TUNNEL_MACHINE_NAME=${TUNNEL_MACHINE_NAME:-my-machine}
+ENV TUNNEL_NAME=vscode-tunnel
+ENV TUNNEL_MACHINE_NAME=my-machine
 
 # Start the tunnel (requires user license acceptance)
-# Use --name to set the tunnel name, --machine-name to set the machine name
-CMD ["sh", "-c", "code tunnel --accept-server-license-terms --name $TUNNEL_NAME --machine-name $TUNNEL_MACHINE_NAME"]
+CMD ["sh", "-c", "code tunnel --accept-server-license-terms --name ${TUNNEL_NAME} --machine-name ${TUNNEL_MACHINE_NAME}"]
