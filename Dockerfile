@@ -40,17 +40,14 @@ RUN tar -xzf vscode_cli.tar.gz -C /usr/local/bin && \
 # Verify installations (run as root before switching user)
 RUN node --version && npm --version && python --version && git --version
 
-# Create non-root user
-RUN groupadd --gid $USER_GID $USERNAME 2>/dev/null || true && \
-    useradd --uid $USER_UID --gid $USER_GID -m $USERNAME 2>/dev/null || true && \
+# Create non-root user FIRST, then setup directories
+RUN groupadd --gid $USER_GID $USERNAME && \
+    useradd --uid $USER_UID --gid $USER_GID -m $USERNAME && \
     echo "$USERNAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
-# Setup directories with proper permissions
+# Setup directories with proper permissions AFTER user creation
 RUN mkdir -p /workspace && \
     chown -R $USERNAME:$USERNAME /workspace
-
-# Ensure code binary is accessible by non-root user
-RUN chmod +x /usr/local/bin/code
 
 # Switch to non-root user
 USER $USERNAME
