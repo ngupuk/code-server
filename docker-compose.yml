@@ -5,6 +5,33 @@ services:
     build: .
     ports:
       - 8080:8080
+
+    # Environment variables for tunnel configuration
+    environment:
+      # TUNNEL_NAME: The name for your VS Code tunnel (default: vscode-tunnel)
+      - TUNNEL_NAME=my-dev-server
+
+      # TUNNEL_MACHINE_NAME: The machine name displayed in VS Code (default: my-machine)
+      - TUNNEL_MACHINE_NAME=dev-box
+
+    # Build-time arguments for user configuration
+    build:
+      context: .
+      args:
+        # USERNAME: Non-root user name (default: vscode)
+        - USERNAME=vscode
+        # USER_UID: User ID (default: 1000) - match with your host user if needed
+        - USER_UID=1000
+        # USER_GID: Group ID (default: 1000) - match with your host user if needed
+        - USER_GID=1000
+
     volumes:
       - ./workspace:/workspace
+
     restart: unless-stopped
+
+# Example: To run as a different user
+# Change the USERNAME, USER_UID, and USER_GID in build args
+# Example: To run with your host user ID (Linux/Mac)
+# Run: id -u $$ id -g
+# Then use those values in USER_UID and USER_GID above

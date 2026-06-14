@@ -1,11 +1,17 @@
 FROM ubuntu:latest
 
+# Build-time arguments for user and hostname configuration
+ARG USERNAME=vscode
+ARG USER_UID=1000
+ARG USER_GID=$USER_UID
+
 # Install dependencies and build tools
 RUN apt-get update && apt-get install -y \
     curl \
     ca-certificates \
     git \
     software-properties-common \
+    sudo \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Node.js 22 LTS (Iron) using NodeSource
@@ -31,10 +37,28 @@ RUN tar -xzf vscode_cli.tar.gz -C /usr/local/bin && \
     chmod +x /usr/local/bin/code && \
     rm vscode_cli.tar.gz
 
+# Create non-root user
+RUN groupadd --gid $USER_GID $USERNAME && \
+    useradd --uid $USER_UID --gid $USER_GID -m $USERNAME && \
+    echo "$USERNAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+# Setup directories with proper permissions
+RUN mkdir -p /workspace && \
+    chown -R $USERNAME:$USERNAME /workspace
+
 # Verify installations
 RUN node --version && npm --version && python --version && git --version
 
+# Switch to non-root user
+USER $USERNAME
+
+# Set working directory
 WORKDIR /workspace
 
+# Environment variables (can be overridden in docker-compose.yml)
+ENV TUNNEL_NAME=${TUNNEL_NAME:-vscode-tunnel}
+ENV TUNNEL_MACHINE_NAME=${TUNNEL_MACHINE_NAME:-my-machine}
+
 # Start the tunnel (requires user license acceptance)
-CMD ["code", "tunnel", "--accept-server-license-terms"]
+# Use --name to set the tunnel name, --machine-name to set the machine name
+CMD ["sh", "-c", "code tunnel --accept-server-license-terms --name $TUNNEL_NAME --machine-name $TUNNEL_MACHINE_NAME"]
