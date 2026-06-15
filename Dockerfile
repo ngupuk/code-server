@@ -61,7 +61,6 @@ WORKDIR /workspace
 
 # Environment variables (can be overridden in docker-compose.yml)
 ENV TUNNEL_NAME=vscode-tunnel
-ENV TUNNEL_MACHINE_NAME=my-machine
 
 # Start the tunnel (requires user license acceptance)
-CMD ["sh", "-c", "code tunnel --accept-server-license-terms --name ${TUNNEL_NAME} --machine-name ${TUNNEL_MACHINE_NAME}"]
+CMD ["sh", "-c", "code tunnel --accept-server-license-terms --name ${TUNNEL_NAME}"]
