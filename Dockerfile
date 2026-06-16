@@ -50,6 +50,7 @@ RUN if getent passwd $USER_UID > /dev/null 2>&1; then userdel $(getent passwd $U
     groupadd --gid $USER_GID $USERNAME && \
     useradd --uid $USER_UID --gid $USER_GID -m $USERNAME && \
     echo "$USERNAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers && \
+    groupadd -f docker && \
     usermod -aG docker $USERNAME
 
 # Setup directories with proper permissions AFTER user creation
