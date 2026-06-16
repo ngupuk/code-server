@@ -27,6 +27,8 @@ services:
       - vscode_config:/home/vscode/.config/code-server
       # Home directory volume - persists shell history and other user data
       - vscode_home:/home/vscode
+      # Docker socket - allows running Docker commands inside container
+      - /var/run/docker.sock:/var/run/docker.sock
 
     restart: unless-stopped
 

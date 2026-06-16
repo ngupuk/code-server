@@ -36,6 +36,40 @@ code tunnel jekyll
 
 Or use the "Connect to Tunnel" feature in VS Code's Remote Explorer.
 
+## Docker Support
+
+This container includes Docker CLI and docker-compose, allowing you to run Docker commands inside the development environment.
+
+### Using Docker Inside the Container
+
+The container is configured with access to the host machine's Docker daemon via socket mounting (`/var/run/docker.sock`). This means:
+
+- ✅ You can run `docker` commands inside the container
+- ✅ Containers built/run inside use the host's Docker daemon
+- ✅ No Docker-in-Docker overhead or additional setup needed
+
+### Example Usage
+
+Once connected to your tunnel, you can run Docker commands:
+
+```bash
+# List running containers
+docker ps
+
+# Build an image
+docker build -t my-image .
+
+# Run a container
+docker run -it my-image bash
+
+# Use docker-compose
+docker-compose up
+```
+
+### Permissions
+
+The non-root user is automatically added to the `docker` group, allowing Docker commands to be run without `sudo`.
+
 ## Configuration
 
 ### Ports

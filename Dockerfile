@@ -12,6 +12,8 @@ RUN apt-get update && apt-get install -y \
     git \
     software-properties-common \
     sudo \
+    docker.io \
+    docker-compose \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Node.js 22 LTS (Iron) using NodeSource
@@ -47,7 +49,8 @@ RUN if getent passwd $USER_UID > /dev/null 2>&1; then userdel $(getent passwd $U
     if getent group $USER_GID > /dev/null 2>&1; then groupdel $(getent group $USER_GID | cut -d: -f1); fi && \
     groupadd --gid $USER_GID $USERNAME && \
     useradd --uid $USER_UID --gid $USER_GID -m $USERNAME && \
-    echo "$USERNAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+    echo "$USERNAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers && \
+    usermod -aG docker $USERNAME
 
 # Setup directories with proper permissions AFTER user creation
 RUN mkdir -p /workspace && \
