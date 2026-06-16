@@ -48,6 +48,15 @@ The container is configured with access to the host machine's Docker daemon via 
 - ✅ Containers built/run inside use the host's Docker daemon
 - ✅ No Docker-in-Docker overhead or additional setup needed
 
+### ⚠️ Security Considerations
+
+**IMPORTANT:** Mounting the Docker socket grants the container user full access to the host's Docker daemon. This effectively grants them root-level access to the entire host system.
+
+- Ensure you only use this container with trusted code
+- Be cautious with projects from untrusted sources that run inside this container
+- Consider this container as having root access to your machine
+- Use with proper network isolation if needed
+
 ### Example Usage
 
 Once connected to your tunnel, you can run Docker commands:
@@ -69,6 +78,14 @@ docker-compose up
 ### Permissions
 
 The non-root user is automatically added to the `docker` group, allowing Docker commands to be run without `sudo`.
+
+### Troubleshooting Docker Socket Issues
+
+If you encounter permission errors when running Docker commands:
+
+1. Ensure the Docker socket has the correct permissions on the host: `ls -l /var/run/docker.sock`
+2. The docker group GID inside the container should match the host's docker group GID
+3. You may need to restart the container after the host Docker daemon restarts
 
 ## Configuration
 
