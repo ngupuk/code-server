@@ -36,6 +36,57 @@ code tunnel jekyll
 
 Or use the "Connect to Tunnel" feature in VS Code's Remote Explorer.
 
+## Docker Support
+
+This container includes Docker CLI and docker-compose, allowing you to run Docker commands inside the development environment.
+
+### Using Docker Inside the Container
+
+The container is configured with access to the host machine's Docker daemon via socket mounting (`/var/run/docker.sock`). This means:
+
+- ✅ You can run `docker` commands inside the container
+- ✅ Containers built/run inside use the host's Docker daemon
+- ✅ No Docker-in-Docker overhead or additional setup needed
+
+### ⚠️ Security Considerations
+
+**IMPORTANT:** Mounting the Docker socket grants the container user full access to the host's Docker daemon. This effectively grants them root-level access to the entire host system.
+
+- Ensure you only use this container with trusted code
+- Be cautious with projects from untrusted sources that run inside this container
+- Consider this container as having root access to your machine
+- Use with proper network isolation if needed
+
+### Example Usage
+
+Once connected to your tunnel, you can run Docker commands:
+
+```bash
+# List running containers
+docker ps
+
+# Build an image
+docker build -t my-image .
+
+# Run a container
+docker run -it my-image bash
+
+# Use docker-compose
+docker-compose up
+```
+
+### Permissions
+
+The non-root user is automatically added to the `docker` group, allowing Docker commands to be run without `sudo`.
+
+### Troubleshooting Docker Socket Issues
+
+If you encounter permission errors when running Docker commands:
+
+1. Ensure the Docker socket has the correct permissions on the host: `ls -l /var/run/docker.sock`
+2. The docker group GID inside the container should match the host's docker group GID
+3. You may need to restart the container after the host Docker daemon restarts
+
 ## Configuration
 
 ### Ports
